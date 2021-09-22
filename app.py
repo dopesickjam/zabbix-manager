@@ -19,8 +19,8 @@ zapi.login(zabbix_user, zabbix_pass)
 
 parser = argparse.ArgumentParser(description='Process zabbix manage')
 parser.add_argument('--config', dest='zabbix_config', help='path to zabbix yaml config', nargs=1, metavar=("FILE"))
-parser.add_argument('--create_update_hosts_groups', dest='create_update_hosts_groups', help='for work with zabbix hosts group', action="store_true")
-parser.add_argument('--create_update_host', dest='create_update_host', help='for work with zabbix host', action="store_true")
+parser.add_argument('--create_hosts_groups', dest='create_hosts_groups', help='for work with zabbix hosts group', action="store_true")
+parser.add_argument('--create_host', dest='create_host', help='for work with zabbix host', action="store_true")
 args = parser.parse_args()
 
 def hostGroupCreate():
@@ -85,10 +85,10 @@ if args.zabbix_config:
     with open(args.zabbix_config[0]) as f:
         data = yaml.load(f, Loader=SafeLoader)
 
-    if args.create_update_hosts_groups:
+    if args.create_hosts_groups:
         logging.info(f'Proccess for creating host group was started')
         hostGroupCreate()
     
-    if args.create_update_host:
+    if args.create_host:
         logging.info(f'Proccess for creating host was started')
         hostCreate()
