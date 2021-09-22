@@ -50,21 +50,24 @@ def hostCreate():
         
         if create_host:
             logging.info(f'Host {host} is not existed, creating...')
+
+            templates_list = []
+            for template in host['templateid']:
+                templates_list.append({'templateid': getTemplateId(template)})
+
             host_create = zapi.host.create(
-                groups = {
+                groups = [{
                     'groupid': getGroupId(host['groupid'])
-                },
-                interfaces = {
+                }],
+                interfaces = [{
                     'type': 1,
                     'main': 1,
                     'useip': 1 if host['use_ip'] else 0,
                     'ip': host['ip'],
                     'dns': host['host'],
                     'port': host['port']
-                },
-                templates = {
-                    'templateid': getTemplateId(host['templateid'])
-                },
+                }],
+                templates = templates_list,
                 host=host['host']
             )
         else:

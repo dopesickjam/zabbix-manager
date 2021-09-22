@@ -7,11 +7,17 @@ hosts:
     port: 10050
     use_ip: False
     groupid: group name 1
-    templateid: template 1
+    templateid: 
+      - template 1
+      - template 2
+      - template 3
   - host: server2.example.com
     ip: 127.0.1.1
     port: 10050
     use_ip: False
     groupid: group name 2
-    templateid: template 2
+    templateid: 
+      - template 1
+      - template 2
+      - template 3
     
