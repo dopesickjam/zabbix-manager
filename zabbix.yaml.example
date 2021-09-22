@@ -6,7 +6,9 @@ hosts:
     ip: 127.0.0.1
     port: 10050
     use_ip: False
-    groupid: group name 1
+    groupid: 
+      - group name 1
+      - group name 2
     templateid: 
       - template 1
       - template 2
@@ -15,7 +17,9 @@ hosts:
     ip: 127.0.1.1
     port: 10050
     use_ip: False
-    groupid: group name 2
+    groupid: 
+      - group name 1
+      - group name 2
     templateid: 
       - template 1
       - template 2

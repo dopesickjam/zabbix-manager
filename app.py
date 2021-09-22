@@ -55,10 +55,12 @@ def hostCreate():
             for template in host['templateid']:
                 templates_list.append({'templateid': getTemplateId(template)})
 
+            groups_list = []
+            for group in host['groupid']:
+                groups_list.append({'groupid': getGroupId(group)})
+
             host_create = zapi.host.create(
-                groups = [{
-                    'groupid': getGroupId(host['groupid'])
-                }],
+                groups = groups_list,
                 interfaces = [{
                     'type': 1,
                     'main': 1,
