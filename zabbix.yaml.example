@@ -1,6 +1,12 @@
 host_group:
   - name: group name 1
   - name: group name 2
+users:
+  - name: Example
+    password: example
+    usergroups:
+      - Zabbix administrators
+    role_id: 1
 hosts:
   - host: server1.example.com
     ip: 127.0.0.1

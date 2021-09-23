@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser(description='Process zabbix manage')
 parser.add_argument('--config', dest='zabbix_config', help='path to zabbix yaml config', nargs=1, metavar=("FILE"))
 parser.add_argument('--create_hosts_groups', dest='create_hosts_groups', help='for work with zabbix hosts group', action="store_true")
 parser.add_argument('--create_host', dest='create_host', help='for work with zabbix host', action="store_true")
+parser.add_argument('--create_user', dest='create_user', help='for work with zabbix user', action="store_true")
 args = parser.parse_args()
 
 def hostGroupCreate():
@@ -84,7 +85,37 @@ def getTemplateId(name):
     for template in zapi.template.get():
         if template['name'] == name:
             return template['templateid']
-    
+
+def getUserGroupId(name):
+    for group in zapi.usergroup.get():
+        if group['name'] == name:
+            return group['usrgrpid']
+
+def userCreate():
+    for user in data['users']:
+        for ex_user in zapi.user.get():
+            if ex_user['username'] == user['name']:
+                create_user = False
+                break
+            else:
+                create_user = True
+
+        if create_user:
+            logging.info(f'User {user} is not existed, creating...')
+
+            groups_list = []
+            for group in user['usergroups']:
+                groups_list.append({'usrgrpid': getUserGroupId(group)})
+
+            user_create = zapi.user.create(
+                alias = user['name'],
+                passwd = user['password'],
+                usrgrps = groups_list,
+                user_medias = [],
+                roleid = user['role_id']
+            )
+        else:
+            logging.info(f'User {user} is existed, skip')
 
 if args.zabbix_config:
     with open(args.zabbix_config[0]) as f:
@@ -97,3 +128,7 @@ if args.zabbix_config:
     if args.create_host:
         logging.info(f'Proccess for creating host was started')
         hostCreate()
+
+    if args.create_user:
+        logging.info(f'Proccess for creating user was started')
+        userCreate()
