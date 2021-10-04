@@ -22,6 +22,7 @@ parser.add_argument('--config', dest='zabbix_config', help='path to zabbix yaml 
 parser.add_argument('--create_hosts_groups', dest='create_hosts_groups', help='for work with zabbix hosts group', action="store_true")
 parser.add_argument('--create_host', dest='create_host', help='for work with zabbix host', action="store_true")
 parser.add_argument('--create_user', dest='create_user', help='for work with zabbix user', action="store_true")
+parser.add_argument('--create_web', dest='create_web', help='for work with zabbix web scenario', action="store_true")
 args = parser.parse_args()
 
 def hostGroupCreate():
@@ -117,6 +118,52 @@ def userCreate():
         else:
             logging.info(f'User {user} is existed, skip')
 
+def webCreate():
+    for web in data['web']:
+        for ex_host in zapi.host.get():
+            if ex_host['host'] == web['hostname']:
+                create_host = False
+                break
+            else:
+                create_host = True
+
+        if create_host:
+            logging.info(f'Web host {web["hostname"]} is not existed, creating...')
+            host_create = zapi.host.create(
+                groups = [{'groupid': getGroupId(web['group'])}],
+                interfaces = [],
+                templates = [],
+                host=web['hostname']
+            )
+
+            hostids = host_create['hostids'][0]
+
+            step_list = []
+            for step in web['steps']:
+                step_dict = {
+                    'name': step['name'],
+                    'url': step['url'],
+                    'status_codes': str(step['status_codes']),
+                    'no': step['number']
+                }
+                step_list.append(step_dict)
+
+            web_create = zapi.httptest.create(
+                name = web['name'],
+                hostid = hostids,
+                steps = step_list
+            )
+            logging.info(f'{web["hostname"]}: created web check')
+
+            trigger_create = zapi.trigger.create(
+                description = f'web check {web["hostname"]}',
+                expression = f"last(/{web['hostname']}/{web['trigger']['type']}[{web['name']}],#{web['trigger']['count']})<>0",
+                priority = web['trigger']['priority']
+            )
+            logging.info(f'{web["hostname"]}: created trigger for web check')
+        else:
+            logging.info(f'Web host {web["hostname"]} is existed, skip')
+
 if args.zabbix_config:
     with open(args.zabbix_config[0]) as f:
         data = yaml.load(f, Loader=SafeLoader)
@@ -132,3 +179,7 @@ if args.zabbix_config:
     if args.create_user:
         logging.info(f'Proccess for creating user was started')
         userCreate()
+    
+    if args.create_web:
+        logging.info(f'Proccess for creating web scenario was started')
+        webCreate()

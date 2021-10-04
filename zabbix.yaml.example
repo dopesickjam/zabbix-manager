@@ -1,6 +1,7 @@
 host_group:
   - name: group name 1
   - name: group name 2
+  - name: web example
 users:
   - name: Example
     password: example
@@ -30,4 +31,17 @@ hosts:
       - template 1
       - template 2
       - template 3
+web:
+  - name: main page check
+    hostname: some.site.com
+    group: web example
+    trigger: 
+      type: web.test.fail
+      count: 3
+      priority: 4 # 0 - not classified; 1 - information; 2 - warning; 3 - average; 4 - high; 5 - disaster
+    steps:
+      - name: main page
+        url: https://some.site.com/
+        status_codes: 200
+        number: 1
     
