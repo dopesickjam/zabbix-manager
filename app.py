@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser(description='Process zabbix manage')
 parser.add_argument('--config', dest='zabbix_config', help='path to zabbix yaml config', nargs=1, metavar=("FILE"))
 parser.add_argument('--create_hosts_groups', dest='create_hosts_groups', help='for work with zabbix hosts group', action="store_true")
 parser.add_argument('--create_host', dest='create_host', help='for work with zabbix host', action="store_true")
+parser.add_argument('--update_host_macros', dest='update_host_macros', help='for update macros for host', action="store_true")
 parser.add_argument('--create_user', dest='create_user', help='for work with zabbix user', action="store_true")
 parser.add_argument('--create_web', dest='create_web', help='for work with zabbix web scenario', action="store_true")
 args = parser.parse_args()
@@ -86,6 +87,28 @@ def hostCreate():
                     )
         else:
             logging.info(f'Host {host} is existed, skip')
+
+def hostUpdateMacros():
+    for host in data['hosts']:
+        macros_list = []
+        for macro in host['macros']:
+            macros_list.append(
+                {
+                    'macro': '{$'+macro+'}',
+                    'value': host['macros'][macro]
+                }
+            )
+
+        macros_update = zapi.host.update(
+            hostid = getHostId(host['host']),
+            macros = macros_list
+        )
+        logging.info(f'Macros for {host["host"]} update')
+
+def getHostId(name):
+    for host in zapi.host.get():
+        if host['name'] == name:
+            return host['hostid']
 
 def getGroupId(name):
     for group in zapi.hostgroup.get():
@@ -185,6 +208,10 @@ if args.zabbix_config:
     if args.create_host:
         logging.info(f'Proccess for creating host was started')
         hostCreate()
+
+    if args.update_host_macros:
+        logging.info(f'Proccess for updating macros was started')
+        hostUpdateMacros()
 
     if args.create_user:
         logging.info(f'Proccess for creating user was started')
