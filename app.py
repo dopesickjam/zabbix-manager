@@ -74,6 +74,16 @@ def hostCreate():
                 templates = templates_list,
                 host=host['host']
             )
+
+            hostids = host_create['hostids'][0]
+
+            if host['macros']:
+                for macro in host['macros']:
+                    macros_create = zapi.usermacro.create(
+                        hostid = hostids,
+                        macro = '{$'+macro+'}',
+                        value = host['macros'][macro]
+                    )
         else:
             logging.info(f'Host {host} is existed, skip')
 

@@ -20,6 +20,7 @@ hosts:
       - template 1
       - template 2
       - template 3
+    macros:
   - host: server2.example.com
     ip: 127.0.1.1
     port: 10050
@@ -31,6 +32,9 @@ hosts:
       - template 1
       - template 2
       - template 3
+    macros:
+      VFS.FS.PUSED.MAX.CRIT: 80
+      VFS.FS.PUSED.MAX.WARN: 70
 web:
   - name: main page check
     hostname: some.site.com
