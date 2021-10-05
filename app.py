@@ -90,20 +90,23 @@ def hostCreate():
 
 def hostUpdateMacros():
     for host in data['hosts']:
-        macros_list = []
-        for macro in host['macros']:
-            macros_list.append(
-                {
-                    'macro': '{$'+macro+'}',
-                    'value': host['macros'][macro]
-                }
-            )
+        if host['macros']:
+            macros_list = []
+            for macro in host['macros']:
+                macros_list.append(
+                    {
+                        'macro': '{$'+macro+'}',
+                        'value': host['macros'][macro]
+                    }
+                )
 
-        macros_update = zapi.host.update(
-            hostid = getHostId(host['host']),
-            macros = macros_list
-        )
-        logging.info(f'Macros for {host["host"]} update')
+            macros_update = zapi.host.update(
+                hostid = getHostId(host['host']),
+                macros = macros_list
+            )
+            logging.info(f'Macros for {host["host"]} update')
+        else:
+            logging.info(f'Host {host["host"]} without macros')
 
 def getHostId(name):
     for host in zapi.host.get():
