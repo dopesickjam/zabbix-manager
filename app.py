@@ -193,7 +193,7 @@ def webCreate():
 
             trigger_create = zapi.trigger.create(
                 description = f'web check {web["hostname"]}',
-                expression = f"last(/{web['hostname']}/{web['trigger']['type']}[{web['name']}],#{web['trigger']['count']})<>0",
+                expression = f"max(/{web['hostname']}/{web['trigger']['type']}[{web['name']}],#{web['trigger']['count']})<>0",
                 priority = web['trigger']['priority']
             )
             logging.info(f'{web["hostname"]}: created trigger for web check')
